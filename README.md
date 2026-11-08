@@ -170,6 +170,19 @@ GOWORK=off go test -run '^$' -fuzz '^FuzzSet$' -fuzztime=30s .
 
 ## 发布
 
-CI 对 `main`、Pull Request 和手动触发的工作流运行格式、race、vet、fuzz、lint 和可达漏洞检查。非 Pull Request 工作流通过后，将同一提交的源码归档和 `SHA256SUMS` 上传为 `source-<commit>` artifact。
+CI 对 `main`、Pull Request、手动触发和 Release 调用运行格式、工作流校验、race、vet、fuzz、lint 和可达漏洞检查。非 Pull Request 工作流通过后，将同一提交的源码归档和 `SHA256SUMS` 上传为 `source-<commit>` artifact。
 
-发布时选择成功 CI 对应的提交创建版本标签，复用该次 CI 的 `set-source.tar.gz` 和 `SHA256SUMS` 创建 GitHub Release，并核对远端标签、发布附件和版本化模块下载。库不提供可执行二进制；版本记录见 [CHANGELOG](CHANGELOG.md)。
+发布流程：
+
+1. 在 [CHANGELOG](CHANGELOG.md) 添加 `## vX.Y.Z — 日期` 条目，将修改合入 `main`。
+2. 为 `main` 中的提交创建并推送 `vX.Y.Z` 标签。Release 工作流支持稳定版本标签，不接受预发布后缀。
+3. Release 校验标签和版本说明，调用 CI，下载本次运行生成的归档，并核对校验和及源码提交。
+4. 工作流创建或恢复草稿，上传 `set-source.tar.gz`、`SHA256SUMS` 并下载核对后发布。已有附件必须逐字节一致，不会被覆盖。
+
+如果发布阶段失败，优先在 Actions 中重跑失败作业，以复用已经完成的 CI artifact。也可以按标签手动触发完整流程：
+
+```sh
+gh workflow run release.yml --ref v0.1.0
+```
+
+手动触发时必须选择版本标签。已发布版本重跑时只核对已有附件；缺失或不一致会失败。库不提供可执行二进制，消费者使用 `go get github.com/gatework/set@vX.Y.Z` 获取模块。
