@@ -62,6 +62,7 @@ func TestNew(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			requireRanges(t, set.New(tt.input...), tt.want)
 		})
 	}
@@ -102,6 +103,7 @@ func TestAdd(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			s := set.New(set.Range[int]{Min: 1, Max: 4}, set.Range[int]{Min: 7, Max: 10})
 			s.Add(tt.lo, tt.hi)
 			requireRanges(t, s, tt.want)
@@ -189,6 +191,7 @@ func TestSetRelations(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			requireRelation(t, base, set.New(tt.other...), tt.want)
 		})
 	}
@@ -313,6 +316,7 @@ func TestString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := tt.set.String(); got != tt.want {
 				t.Fatalf("String() = %q, want %q", got, tt.want)
 			}
@@ -322,19 +326,56 @@ func TestString(t *testing.T) {
 
 func TestIntegerTypes(t *testing.T) {
 	t.Parallel()
-	t.Run("int", func(t *testing.T) { testIntegerBounds[int](t, math.MinInt, math.MaxInt) })
-	t.Run("int8", func(t *testing.T) { testIntegerBounds[int8](t, math.MinInt8, math.MaxInt8) })
-	t.Run("int16", func(t *testing.T) { testIntegerBounds[int16](t, math.MinInt16, math.MaxInt16) })
-	t.Run("int32", func(t *testing.T) { testIntegerBounds[int32](t, math.MinInt32, math.MaxInt32) })
-	t.Run("int64", func(t *testing.T) { testIntegerBounds[int64](t, math.MinInt64, math.MaxInt64) })
-	t.Run("uint", func(t *testing.T) { testIntegerBounds[uint](t, 0, math.MaxUint) })
-	t.Run("uint8", func(t *testing.T) { testIntegerBounds[uint8](t, 0, math.MaxUint8) })
-	t.Run("uint16", func(t *testing.T) { testIntegerBounds[uint16](t, 0, math.MaxUint16) })
-	t.Run("uint32", func(t *testing.T) { testIntegerBounds[uint32](t, 0, math.MaxUint32) })
-	t.Run("uint64", func(t *testing.T) { testIntegerBounds[uint64](t, 0, math.MaxUint64) })
-	t.Run("uintptr", func(t *testing.T) { testIntegerBounds[uintptr](t, 0, ^uintptr(0)) })
-	t.Run("named unsigned", func(t *testing.T) { testIntegerBounds[port](t, 0, math.MaxUint16) })
+	t.Run("int", func(t *testing.T) {
+		t.Parallel()
+		testIntegerBounds[int](t, math.MinInt, math.MaxInt)
+	})
+	t.Run("int8", func(t *testing.T) {
+		t.Parallel()
+		testIntegerBounds[int8](t, math.MinInt8, math.MaxInt8)
+	})
+	t.Run("int16", func(t *testing.T) {
+		t.Parallel()
+		testIntegerBounds[int16](t, math.MinInt16, math.MaxInt16)
+	})
+	t.Run("int32", func(t *testing.T) {
+		t.Parallel()
+		testIntegerBounds[int32](t, math.MinInt32, math.MaxInt32)
+	})
+	t.Run("int64", func(t *testing.T) {
+		t.Parallel()
+		testIntegerBounds[int64](t, math.MinInt64, math.MaxInt64)
+	})
+	t.Run("uint", func(t *testing.T) {
+		t.Parallel()
+		testIntegerBounds[uint](t, 0, math.MaxUint)
+	})
+	t.Run("uint8", func(t *testing.T) {
+		t.Parallel()
+		testIntegerBounds[uint8](t, 0, math.MaxUint8)
+	})
+	t.Run("uint16", func(t *testing.T) {
+		t.Parallel()
+		testIntegerBounds[uint16](t, 0, math.MaxUint16)
+	})
+	t.Run("uint32", func(t *testing.T) {
+		t.Parallel()
+		testIntegerBounds[uint32](t, 0, math.MaxUint32)
+	})
+	t.Run("uint64", func(t *testing.T) {
+		t.Parallel()
+		testIntegerBounds[uint64](t, 0, math.MaxUint64)
+	})
+	t.Run("uintptr", func(t *testing.T) {
+		t.Parallel()
+		testIntegerBounds[uintptr](t, 0, ^uintptr(0))
+	})
+	t.Run("named unsigned", func(t *testing.T) {
+		t.Parallel()
+		testIntegerBounds[port](t, 0, math.MaxUint16)
+	})
 	t.Run("named signed", func(t *testing.T) {
+		t.Parallel()
 		testIntegerBounds[signedInteger](t, math.MinInt64, math.MaxInt64)
 	})
 }
