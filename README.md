@@ -1,6 +1,6 @@
 # set
 
-使用闭区间存储整数集合的 Go 模块，适用于端口、IPv4 整数地址及其他整数范围。模块路径为 `github.com/gatework/set`，需要 Go 1.27.0 或更高版本，仅依赖标准库。
+使用闭区间存储整数集合的 Go 模块，适用于端口、IPv4 整数地址及其他整数范围。模块路径为 `github.com/gatework/set`，需要 Go 1.26.0 或更高版本，仅依赖标准库。
 
 例如，整个 `uint64` 值域只占一个区间。运算量取决于区间数量，不逐个存储或遍历范围内的整数。
 
@@ -28,10 +28,10 @@ func main() {
 }
 ```
 
-版本：[`v0.1.0`](https://github.com/gatework/set/releases/tag/v0.1.0)。公开模块，可直接按版本安装：
+版本：[`v0.1.1`](https://github.com/gatework/set/releases/tag/v0.1.1)。公开模块，可直接按版本安装：
 
 ```sh
-go get github.com/gatework/set@v0.1.0
+go get github.com/gatework/set@v0.1.1
 ```
 
 在模块目录内可执行 `go doc .` 查看 API，执行 `make check` 运行检查。
@@ -152,7 +152,7 @@ Go 版本还明确支持有符号整数和完整的 `uint64` 值域。
 ## 开发与验证
 
 ```sh
-make check # gofmt 检查、go test -race ./...、go vet ./...
+make check # go-standards v1.0.2 的统一检查
 make fuzz  # 30 秒 FuzzSet，使用独立的逐点模型
 ```
 
@@ -166,7 +166,7 @@ GOWORK=off go test -run '^$' -fuzz '^FuzzSet$' -fuzztime=30s .
 
 测试覆盖六点域的全部 4096 个集合对、各整数类型的极值、构造和返回切片隔离、值复制、空结果、自身合并、迭代快照与提前退出。Fuzz 使用有符号八位整数完整值域的位图校验实际覆盖范围，验证标准集合关系及复制隔离。
 
-修改后运行 `make fmt` 和 `make check`；涉及集合算法或存储所有权的修改还应运行 `make fuzz`。如已安装支持 Go 1.27 的 golangci-lint v2，可额外运行 `make lint`。
+修改后运行 `make fmt` 和 `make check`；涉及集合算法或存储所有权的修改还应运行 `make fuzz`。`make check` 使用固定版本的 go-standards、golangci-lint 和 govulncheck，无需预先安装这些工具。
 
 ## 发布
 
@@ -182,7 +182,7 @@ CI 对 `main`、Pull Request、手动触发和 Release 调用运行格式、工�
 如果发布阶段失败，优先在 Actions 中重跑失败作业，以复用已经完成的 CI artifact。也可以按标签手动触发完整流程：
 
 ```sh
-gh workflow run release.yml --ref v0.1.0
+gh workflow run release.yml --ref v0.1.1
 ```
 
 手动触发时必须选择版本标签。已发布版本重跑时只核对已有附件；缺失或不一致会失败。库不提供可执行二进制，消费者使用 `go get github.com/gatework/set@vX.Y.Z` 获取模块。

@@ -29,6 +29,7 @@ jobs:
       - uses: actions/setup-go@v7.0.0
         with:
           go-version: ${{ matrix.go }}
+          check-latest: true
           cache: false
       - name: Validate workflows
         run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12 .github/workflows/ci.yml .github/workflows/release.yml
@@ -53,3 +54,4 @@ jobs:
             dist/SHA256SUMS
           if-no-files-found: error
           retention-days: 14
+          overwrite: true
