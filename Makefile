@@ -1,24 +1,8 @@
-GO ?= go
-export GOWORK := off
+STANDARDS_DIR ?= $(wildcard $(CURDIR)/../go-standards)
+include standard.mk
 
-.PHONY: check test vet fmt-check fmt fuzz lint
+.PHONY: fuzz
 
-check: fmt-check test vet
-
-test:
-	$(GO) test -race ./...
-
-vet:
-	$(GO) vet ./...
-
-fmt-check:
-	@test -z "$$(gofmt -l *.go)" || { gofmt -l *.go; exit 1; }
-
-fmt:
-	gofmt -w *.go
-
+# The independent point model cross-checks every range algorithm.
 fuzz:
 	$(GO) test -run '^$$' -fuzz '^FuzzSet$$' -fuzztime=30s .
-
-lint:
-	golangci-lint run ./...

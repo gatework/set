@@ -1,0 +1,8 @@
+# set import boundaries (STANDARD.md ARC-1).
+declared: [.]
+
+rules:
+  - name: set depends only on the standard library
+    packages: [.]
+    deny: [github.com/..., golang.org/..., go.yaml.in/..., gopkg.in/...]
+    transitive: true
