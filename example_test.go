@@ -49,3 +49,17 @@ func ExampleSet_Clone() {
 	// {[1,4]}
 	// {[1,8]}
 }
+
+func ExampleParse() {
+	vlans, err := set.Parse[uint16]("10-20,30,15-25")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	used := set.New(set.Range[uint16]{Min: 12, Max: 14})
+	fmt.Println(vlans.Compact())
+	fmt.Println(vlans.Difference(used).Compact())
+	// Output:
+	// 10-25,30
+	// 10-11,15-25,30
+}

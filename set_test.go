@@ -1,6 +1,7 @@
 package set_test
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"slices"
@@ -431,6 +432,8 @@ func TestExhaustiveSmallDomain(t *testing.T) {
 			a, b := sets[left], sets[right]
 			requireModel(t, a.Union(b), models[left|right])
 			requireModel(t, a.Intersection(b), models[left&right])
+			requireModel(t, a.Difference(b), models[left&^right])
+			requireTextRoundTrip(t, a)
 			merged := a.Clone()
 			merged.Merge(b)
 			requireModel(t, merged, models[left|right])
@@ -612,6 +615,12 @@ func FuzzSet(f *testing.F) {
 			unionModel[i] = leftModel[i] || rightModel[i]
 			intersectionModel[i] = leftModel[i] && rightModel[i]
 		}
+		var differenceModel pointModel
+		for i := range differenceModel {
+			differenceModel[i] = leftModel[i] && !rightModel[i]
+		}
+		requireModel(t, left.Difference(right), differenceModel)
+		requireTextRoundTrip(t, left)
 		union, intersection := left.Union(right), left.Intersection(right)
 		requireModel(t, union, unionModel)
 		requireModel(t, intersection, intersectionModel)
@@ -633,4 +642,62 @@ func FuzzSet(f *testing.F) {
 			t.Fatalf("snapshot changed after mutation: %v", got)
 		}
 	})
+}
+
+func TestDifferenceAndText(t *testing.T) {
+	t.Parallel()
+	a := set.New(set.Range[int]{Min: 1, Max: 10}, set.Range[int]{Min: 20, Max: 30})
+	b := set.New(set.Range[int]{Min: 3, Max: 4}, set.Range[int]{Min: 10, Max: 22}, set.Range[int]{Min: 30, Max: 40})
+	if got := a.Difference(b).Compact(); got != "1-2,5-9,23-29" {
+		t.Fatalf("Difference = %q", got)
+	}
+	if n, ok := a.Size(); !ok || n != 21 {
+		t.Fatalf("Size = %d, %v", n, ok)
+	}
+	full := set.New(set.Range[uint64]{Min: 0, Max: math.MaxUint64})
+	if _, ok := full.Size(); ok {
+		t.Fatal("full uint64 domain must overflow Size")
+	}
+	for _, tc := range []struct {
+		in, want string
+		ok       bool
+	}{
+		{"", "", true},
+		{" 1-4, 7 ,3", "1-4,7", true},
+		{"-5--3,-1", "-5--3,-1", true},
+		{"4-1", "", false},
+		{"1,,2", "", false},
+		{"x", "", false},
+		{"200", "", false},
+	} {
+		s, err := set.Parse[int8](tc.in)
+		if (err == nil) != tc.ok {
+			t.Fatalf("Parse(%q) err = %v", tc.in, err)
+		}
+		if err != nil {
+			if !errors.Is(err, set.ErrSyntax) {
+				t.Fatalf("Parse(%q) err = %v, want ErrSyntax", tc.in, err)
+			}
+			continue
+		}
+		text, _ := s.MarshalText()
+		if string(text) != tc.want {
+			t.Fatalf("Parse(%q) = %q, want %q", tc.in, text, tc.want)
+		}
+		var back set.Set[int8]
+		if err := back.UnmarshalText(text); err != nil || !back.Equal(s) {
+			t.Fatalf("round trip %q: %v", text, err)
+		}
+	}
+	if _, err := set.Parse[uint8]("-1"); !errors.Is(err, set.ErrSyntax) {
+		t.Fatalf("negative unsigned: %v", err)
+	}
+}
+
+func requireTextRoundTrip[T set.Integer](t *testing.T, s *set.Set[T]) {
+	t.Helper()
+	back, err := set.Parse[T](s.Compact())
+	if err != nil || !back.Equal(s) {
+		t.Fatalf("text round trip of %v: %v, %v", s, back, err)
+	}
 }

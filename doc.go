@@ -6,8 +6,9 @@
 // including types defined with those underlying types, are supported.
 //
 // The zero value of Set is an empty set. New and Add accept endpoints in either
-// order. Add and Merge update the receiver; Union, Intersection, and Clone
-// return independent sets. Nil *Set receivers and arguments are not supported.
+// order. Add and Merge update the receiver; Union, Intersection, Difference,
+// and Clone return independent sets. Parse and Compact read and write the
+// "1-4,7" range-list notation used for VLAN and port lists. Nil *Set receivers and arguments are not supported.
 //
 // Stored range slices are never modified after publication. Copying a Set value
 // therefore gives an independent set, and All returns a reusable snapshot.

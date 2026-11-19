@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.2.0 - 2026-11-18
+
+- 新增 `Difference` 差集与 `Size` 元素计数（满 64 位域返回 false）。
+- 新增 `Parse` 读取设备常用的区间列表文本（如 `1-4,7,10-12`），`Compact` 输出同格式；`Set` 实现 `encoding.TextMarshaler`/`TextUnmarshaler`，可直接用于 YAML/JSON。
+- 差集与文本往返纳入独立逐点模型的穷举测试与 fuzz。
+- 接入 go-standards v1.2.0。
+
 ## v0.1.1 - 2026-11-11
 
 - 最低 Go 版本调整为 1.26.0，同时检查 Go 1.26 和 1.27。
